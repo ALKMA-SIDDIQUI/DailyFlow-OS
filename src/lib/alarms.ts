@@ -1,6 +1,9 @@
 // Web Audio API Synthesizer for Cyberpunk / VibeCode Sound FX
 
 let audioCtx: AudioContext | null = null;
+let alarmIntervalId: ReturnType<typeof setInterval> | null = null;
+let alarmTimeoutId: ReturnType<typeof setTimeout> | null = null;
+let isAudioMuted = false;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
@@ -16,7 +19,19 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
+export function setAudioMuted(muted: boolean) {
+  isAudioMuted = muted;
+  if (muted) {
+    stopContinuousDeadlineAlarm();
+  }
+}
+
+export function getAudioMuted(): boolean {
+  return isAudioMuted;
+}
+
 export function playTaskCompleteSound() {
+  if (isAudioMuted) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -44,6 +59,7 @@ export function playTaskCompleteSound() {
 }
 
 export function playDeadlineAlarmSound() {
+  if (isAudioMuted) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -73,7 +89,43 @@ export function playDeadlineAlarmSound() {
   }
 }
 
+/**
+ * Starts continuous alarm sound. Automatically turns OFF after 30 seconds max.
+ */
+export function startContinuousDeadlineAlarm(onAutoStop?: () => void) {
+  stopContinuousDeadlineAlarm();
+  if (isAudioMuted) return;
+
+  playDeadlineAlarmSound();
+
+  // Repeat alarm sound pulse every 2 seconds
+  alarmIntervalId = setInterval(() => {
+    playDeadlineAlarmSound();
+  }, 2000);
+
+  // Automatically turn off after exactly 30 seconds
+  alarmTimeoutId = setTimeout(() => {
+    stopContinuousDeadlineAlarm();
+    if (onAutoStop) onAutoStop();
+  }, 30000);
+}
+
+/**
+ * Stops any continuous alarm sound immediately (manual turn off)
+ */
+export function stopContinuousDeadlineAlarm() {
+  if (alarmIntervalId) {
+    clearInterval(alarmIntervalId);
+    alarmIntervalId = null;
+  }
+  if (alarmTimeoutId) {
+    clearTimeout(alarmTimeoutId);
+    alarmTimeoutId = null;
+  }
+}
+
 export function playRandomTaskTickSound() {
+  if (isAudioMuted) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -99,6 +151,7 @@ export function playRandomTaskTickSound() {
 }
 
 export function playRandomTaskSelectSound() {
+  if (isAudioMuted) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 

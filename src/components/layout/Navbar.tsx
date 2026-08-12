@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { User } from '@/lib/types';
-import { Flame, Plus, Dice5, Trophy, LogOut, User as UserIcon, Menu, X, ShieldCheck } from 'lucide-react';
+import { Flame, Plus, Dice5, Trophy, LogOut, ShieldCheck, Volume2, VolumeX } from 'lucide-react';
 import { useToast } from '../ui/Toast';
+import { setAudioMuted, getAudioMuted } from '@/lib/alarms';
 
 interface NavbarProps {
   user: User | null;
@@ -24,7 +25,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const router = useRouter();
   const { showToast } = useToast();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  useEffect(() => {
+    setIsMuted(getAudioMuted());
+  }, []);
+
+  const toggleMute = () => {
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    setAudioMuted(nextMuted);
+    showToast(nextMuted ? 'Audio alarms muted' : 'Audio alarms enabled', 'info');
+  };
 
   const handleLogout = async () => {
     try {
@@ -70,6 +82,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Quick Action Buttons & Profile Menu */}
         {user ? (
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Audio Mute/Unmute Toggle */}
+            <button
+              onClick={toggleMute}
+              className={`p-2 rounded-lg transition-colors border ${
+                isMuted
+                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+                  : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-cyan-300'
+              }`}
+              title={isMuted ? 'Unmute Audio Alarms' : 'Mute Audio Alarms'}
+            >
+              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-cyan-400" />}
+            </button>
+
             <button
               onClick={onOpenRandomTask}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 text-xs font-medium transition-all shadow-purple-glow active:scale-95"
@@ -97,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {/* Profile & Avatar */}
-            <div className="relative group ml-2">
+            <div className="relative group ml-1">
               <Link href="/dashboard/profile" className="flex items-center gap-2.5 p-1 rounded-full hover:bg-white/5 transition-colors">
                 {user.avatar_url ? (
                   <img
