@@ -5,9 +5,6 @@ node_modules/
 .next/
 out/
 
-# Database
-dailyflow.db*
-
 # Environment variables
 .env
 .env.local
