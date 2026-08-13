@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
 import { getDb } from '@/lib/db';
-import { ActivityHeatmapDay } from '@/lib/types';
+import { ActivityHeatmapDay, DailyProgressItem } from '@/lib/types';
 import { getTodayDateString, calculateUserStreaks, addDaysToDateString } from '@/lib/dates';
 
 export async function GET() {
@@ -49,6 +49,47 @@ export async function GET() {
     const datesArray = completedTaskDates.map(d => d.date_str).filter(Boolean);
     const { currentStreak, longestStreak } = calculateUserStreaks(datesArray);
 
+    // Generate 14-day daily progress breakdown report (Today, Yesterday, & past days)
+    const dailyProgress: DailyProgressItem[] = [];
+    for (let i = 13; i >= 0; i--) {
+      const dStr = addDaysToDateString(todayStr, -i);
+      
+      const compRow = db.prepare(`
+        SELECT COUNT(*) as count FROM tasks
+        WHERE user_id = ? AND status = 'COMPLETED' AND SUBSTR(completed_at, 1, 10) = ?
+      `).get(user.id, dStr) as { count: number } || { count: 0 };
+
+      const pendRow = db.prepare(`
+        SELECT COUNT(*) as count FROM tasks
+        WHERE user_id = ? AND status = 'PENDING' AND due_date = ?
+      `).get(user.id, dStr) as { count: number } || { count: 0 };
+
+      const overRow = db.prepare(`
+        SELECT COUNT(*) as count FROM tasks
+        WHERE user_id = ? AND status = 'OVERDUE' AND due_date = ?
+      `).get(user.id, dStr) as { count: number } || { count: 0 };
+
+      const compC = compRow.count;
+      const pendC = pendRow.count;
+      const overC = overRow.count;
+      const totC = compC + pendC + overC;
+      const pct = totC > 0 ? Math.round((compC / totC) * 100) : (compC > 0 ? 100 : 0);
+
+      let dayLabel = dStr.substring(5); // MM-DD
+      if (i === 0) dayLabel = 'Today';
+      else if (i === 1) dayLabel = 'Yesterday';
+
+      dailyProgress.push({
+        date: dStr,
+        dayLabel,
+        totalCount: totC,
+        completedCount: compC,
+        pendingCount: pendC,
+        overdueCount: overC,
+        percentage: pct
+      });
+    }
+
     // Generate 30-day activity heatmap grid for recent activity
     const heatmap: ActivityHeatmapDay[] = [];
     for (let i = 29; i >= 0; i--) {
@@ -82,6 +123,7 @@ export async function GET() {
         completedChallengesCount: completedChallengesRow.count,
         currentStreak,
         longestStreak,
+        dailyProgress,
         heatmap
       }
     });
@@ -101,6 +143,7 @@ export async function GET() {
         completedChallengesCount: 0,
         currentStreak: 0,
         longestStreak: 0,
+        dailyProgress: [],
         heatmap: []
       },
       error: errMessage

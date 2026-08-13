@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { StatCards } from '@/components/dashboard/StatCards';
 import { ContributionChart } from '@/components/dashboard/ContributionChart';
+import { DailyProgressBarChart } from '@/components/dashboard/DailyProgressBarChart';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { ChallengeGrid } from '@/components/challenges/ChallengeGrid';
 import { EditTaskModal } from '@/components/tasks/EditTaskModal';
@@ -22,6 +23,8 @@ export default function DashboardOverviewPage() {
     activeChallengesCount: 0,
     completedChallengesCount: 0,
     todayCompletionRate: 0,
+    dailyProgress: [],
+    heatmap: [],
   });
 
   const [heatmap, setHeatmap] = useState<ActivityHeatmapDay[]>([]);
@@ -110,6 +113,9 @@ export default function DashboardOverviewPage() {
 
       {/* Metric Stat Cards */}
       <StatCards stats={stats} />
+
+      {/* Daily Progress Bar Chart (Today % & Past Days Report) */}
+      <DailyProgressBarChart dailyProgress={stats.dailyProgress} />
 
       {/* Activity Heatmap Chart */}
       <ContributionChart heatmap={heatmap} />

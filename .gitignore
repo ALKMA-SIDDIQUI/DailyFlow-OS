@@ -5,6 +5,11 @@ node_modules/
 .next/
 out/
 
+# SQLite local database
+dailyflow.db
+dailyflow.db-wal
+dailyflow.db-shm
+
 # Environment variables
 .env
 .env.local
@@ -18,11 +23,9 @@ npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
 # IDE
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
+.vscode/

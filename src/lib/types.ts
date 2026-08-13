@@ -64,6 +64,16 @@ export interface ChallengeLog {
   completed_at?: string | null;
 }
 
+export interface DailyProgressItem {
+  date: string; // YYYY-MM-DD
+  dayLabel: string; // 'Today', 'Yesterday', 'Wed 12', etc.
+  totalCount: number;
+  completedCount: number;
+  pendingCount: number;
+  overdueCount: number;
+  percentage: number;
+}
+
 export interface DashboardStats {
   todayTasksCount: number;
   pendingCount: number;
@@ -74,6 +84,8 @@ export interface DashboardStats {
   activeChallengesCount: number;
   completedChallengesCount: number;
   todayCompletionRate: number; // percentage 0-100
+  dailyProgress?: DailyProgressItem[];
+  heatmap?: ActivityHeatmapDay[];
 }
 
 export interface ActivityHeatmapDay {
