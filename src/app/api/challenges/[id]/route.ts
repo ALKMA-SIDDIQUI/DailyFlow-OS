@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
-import { getDb } from '@/lib/db';
-import { Challenge, ChallengeLog } from '@/lib/types';
+import { dbGetChallengeById, dbUpdateChallenge, dbDeleteChallenge, dbUpdateChallengeLog } from '@/lib/db-adapter';
 import { getTodayDateString } from '@/lib/dates';
 
 export async function GET(
@@ -14,33 +13,29 @@ export async function GET(
   }
 
   const challengeId = params.id;
-  const db = getDb();
-
-  // Enforce ownership authorization check (IDOR Protection)
-  const challenge = db.prepare('SELECT * FROM challenges WHERE id = ? AND user_id = ?').get(challengeId, user.id) as Challenge | undefined;
+  const challenge = await dbGetChallengeById(challengeId, user.id);
 
   if (!challenge) {
     return NextResponse.json({ error: 'Challenge not found or access denied' }, { status: 404 });
   }
 
-  // Evaluate missed days for past pending logs
   const todayStr = getTodayDateString();
-  try {
-    db.prepare(`
-      UPDATE challenge_logs
-      SET status = 'MISSED'
-      WHERE challenge_id = ? AND date_str < ? AND status = 'PENDING'
-    `).run(challengeId, todayStr);
-  } catch (e) {}
+  const logsList = challenge.logs || [];
 
-  const logs = db.prepare('SELECT * FROM challenge_logs WHERE challenge_id = ? ORDER BY day_number ASC').all(challengeId) as ChallengeLog[];
+  // Evaluate missed days for past pending logs
+  for (const l of logsList) {
+    if (l.date_str < todayStr && l.status === 'PENDING') {
+      l.status = 'MISSED';
+      await dbUpdateChallengeLog(l.id, user.id, { status: 'MISSED' });
+    }
+  }
 
-  const completedCount = logs.filter(l => l.status === 'COMPLETED').length;
-  const missedCount = logs.filter(l => l.status === 'MISSED').length;
+  const completedCount = logsList.filter((l) => l.status === 'COMPLETED').length;
+  const missedCount = logsList.filter((l) => l.status === 'MISSED').length;
 
   let streak = 0;
   let maxStreak = 0;
-  for (const log of logs) {
+  for (const log of logsList) {
     if (log.status === 'COMPLETED') {
       streak++;
       if (streak > maxStreak) maxStreak = streak;
@@ -50,21 +45,27 @@ export async function GET(
   }
 
   const newStatus = completedCount >= 21 ? 'COMPLETED' : challenge.status;
+  const longestStreakVal = Math.max(challenge.longest_streak || 0, maxStreak);
 
-  db.prepare(`
-    UPDATE challenges
-    SET completed_days_count = ?, missed_days_count = ?, current_streak = ?, longest_streak = ?, status = ?
-    WHERE id = ? AND user_id = ?
-  `).run(completedCount, missedCount, streak, Math.max(challenge.longest_streak, maxStreak), newStatus, challengeId, user.id);
+  await dbUpdateChallenge(challengeId, user.id, {
+    completed_days_count: completedCount,
+    missed_days_count: missedCount,
+    current_streak: streak,
+    longest_streak: longestStreakVal,
+    status: newStatus,
+  });
 
-  challenge.completed_days_count = completedCount;
-  challenge.missed_days_count = missedCount;
-  challenge.current_streak = streak;
-  challenge.longest_streak = Math.max(challenge.longest_streak, maxStreak);
-  challenge.status = newStatus;
-  challenge.logs = logs;
-
-  return NextResponse.json({ challenge });
+  return NextResponse.json({
+    challenge: {
+      ...challenge,
+      completed_days_count: completedCount,
+      missed_days_count: missedCount,
+      current_streak: streak,
+      longest_streak: longestStreakVal,
+      status: newStatus,
+      logs: logsList,
+    },
+  });
 }
 
 export async function DELETE(
@@ -77,22 +78,13 @@ export async function DELETE(
   }
 
   const challengeId = params.id;
-  const db = getDb();
+  const existing = await dbGetChallengeById(challengeId, user.id);
 
-  // Enforce ownership authorization check (IDOR Protection)
-  const existing = db.prepare('SELECT id FROM challenges WHERE id = ? AND user_id = ?').get(challengeId, user.id);
   if (!existing) {
     return NextResponse.json({ error: 'Challenge not found or access denied' }, { status: 404 });
   }
 
-  // Delete associated tasks linked to this challenge
-  db.prepare('DELETE FROM tasks WHERE challenge_id = ? AND user_id = ?').run(challengeId, user.id);
-
-  // Delete challenge logs
-  db.prepare('DELETE FROM challenge_logs WHERE challenge_id = ? AND user_id = ?').run(challengeId, user.id);
-
-  // Delete challenge entity
-  db.prepare('DELETE FROM challenges WHERE id = ? AND user_id = ?').run(challengeId, user.id);
+  await dbDeleteChallenge(challengeId, user.id);
 
   return NextResponse.json({ message: 'Challenge deleted successfully' });
 }

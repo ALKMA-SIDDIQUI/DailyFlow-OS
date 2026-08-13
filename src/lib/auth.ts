@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import { getDb } from './db';
+import { dbGetUserById } from './db-adapter';
 import { User } from './types';
 
 const JWT_SECRET = new TextEncoder().encode(
@@ -9,7 +9,7 @@ const JWT_SECRET = new TextEncoder().encode(
 );
 
 const COOKIE_NAME = 'dailyflow_session';
-const SESSION_DURATION_SECONDS = 7 * 24 * 60 * 60; // 7 days (>= 30 mins)
+const SESSION_DURATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 export async function hashPassword(password: string): Promise<string> {
   return await bcrypt.hash(password, 10);
@@ -61,20 +61,17 @@ export async function getSessionUser(): Promise<User | null> {
 
     if (!payload?.userId) return null;
 
-    const db = getDb();
-    const row = db.prepare('SELECT id, email, username, full_name, avatar_url, bio, created_at FROM users WHERE id = ?').get(payload.userId) as Record<string, unknown> | undefined;
+    const user = await dbGetUserById(payload.userId);
+    if (!user) return null;
 
-    if (!row) return null;
-
-    // Convert database row to a plain JS object to avoid null prototype React Flight serialization errors
     return {
-      id: String(row.id),
-      email: String(row.email),
-      username: String(row.username),
-      full_name: String(row.full_name),
-      avatar_url: row.avatar_url ? String(row.avatar_url) : null,
-      bio: row.bio ? String(row.bio) : null,
-      created_at: String(row.created_at),
+      id: String(user.id),
+      email: String(user.email),
+      username: String(user.username),
+      full_name: String(user.full_name),
+      avatar_url: user.avatar_url ? String(user.avatar_url) : null,
+      bio: user.bio ? String(user.bio) : null,
+      created_at: String(user.created_at),
     };
   } catch (error) {
     return null;

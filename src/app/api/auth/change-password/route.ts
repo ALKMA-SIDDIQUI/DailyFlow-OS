@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionUser, verifyPassword, hashPassword } from '@/lib/auth';
-import { getDb } from '@/lib/db';
+import { getSessionUser, hashPassword, verifyPassword } from '@/lib/auth';
+import { dbGetUserById, dbUpdateUser } from '@/lib/db-adapter';
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUser();
@@ -17,23 +17,21 @@ export async function POST(req: NextRequest) {
     }
 
     if (newPassword.length < 6) {
-      return NextResponse.json({ error: 'New password must be at least 6 characters' }, { status: 400 });
+      return NextResponse.json({ error: 'New password must be at least 6 characters long' }, { status: 400 });
     }
 
-    const db = getDb();
-    const row = db.prepare('SELECT password_hash FROM users WHERE id = ?').get(user.id) as { password_hash: string } | undefined;
-
-    if (!row) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const dbUser = await dbGetUserById(user.id);
+    if (!dbUser) {
+      return NextResponse.json({ error: 'User record not found' }, { status: 404 });
     }
 
-    const isCurrentValid = await verifyPassword(currentPassword, row.password_hash);
-    if (!isCurrentValid) {
-      return NextResponse.json({ error: 'Incorrect current password' }, { status: 400 });
+    const isValid = await verifyPassword(currentPassword, dbUser.password_hash);
+    if (!isValid) {
+      return NextResponse.json({ error: 'Current password is incorrect' }, { status: 400 });
     }
 
     const newHash = await hashPassword(newPassword);
-    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(newHash, user.id);
+    await dbUpdateUser(user.id, { password_hash: newHash });
 
     return NextResponse.json({ message: 'Password updated successfully' });
   } catch (error: unknown) {

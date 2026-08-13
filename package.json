@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "db:migrate": "node scripts/migrate-to-supabase.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "jose": "^5.9.6",

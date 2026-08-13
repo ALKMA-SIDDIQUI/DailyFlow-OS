@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
-import { getDb } from '@/lib/db';
-import { Task } from '@/lib/types';
+import { dbGetTaskById, dbUpdateTask, dbDeleteTask } from '@/lib/db-adapter';
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const user = await getSessionUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const task = await dbGetTaskById(params.id, user.id);
+  if (!task) {
+    return NextResponse.json({ error: 'Task not found or access denied' }, { status: 404 });
+  }
+
+  return NextResponse.json({ task });
+}
 
 export async function PATCH(
   req: NextRequest,
@@ -12,46 +28,35 @@ export async function PATCH(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const taskId = params.id;
-  const db = getDb();
-
-  // Enforce ownership authorization check (IDOR Protection)
-  const existing = db.prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?').get(taskId, user.id) as Task | undefined;
-  if (!existing) {
-    return NextResponse.json({ error: 'Task not found or access denied' }, { status: 404 });
-  }
-
   try {
+    const existing = await dbGetTaskById(params.id, user.id);
+    if (!existing) {
+      return NextResponse.json({ error: 'Task not found or access denied' }, { status: 404 });
+    }
+
     const body = await req.json();
-    const { title, description, category, priority, due_date, deadline_time, reminder_offset, is_random_eligible, status } = body;
+    const updates: Record<string, unknown> = {};
 
-    const newTitle = title !== undefined ? title.trim() : existing.title;
-    const newDesc = description !== undefined ? (description ? description.trim() : null) : existing.description;
-    const newCategory = category || existing.category;
-    const newPriority = priority || existing.priority;
-    const newDueDate = due_date !== undefined ? due_date : existing.due_date;
-    const newDeadlineTime = deadline_time !== undefined ? deadline_time : existing.deadline_time;
-    const newReminderOffset = reminder_offset !== undefined ? reminder_offset : existing.reminder_offset;
-    const newRandomEligible = is_random_eligible !== undefined ? (is_random_eligible ? 1 : 0) : existing.is_random_eligible;
-    const newStatus = status || existing.status;
+    if (body.title !== undefined) updates.title = String(body.title).trim();
+    if (body.description !== undefined) updates.description = body.description ? String(body.description).trim() : null;
+    if (body.category !== undefined) updates.category = body.category;
+    if (body.priority !== undefined) updates.priority = body.priority;
+    if (body.status !== undefined) updates.status = body.status;
+    if (body.due_date !== undefined) updates.due_date = body.due_date;
+    if (body.deadline_time !== undefined) updates.deadline_time = body.deadline_time;
+    if (body.reminder_offset !== undefined) updates.reminder_offset = body.reminder_offset;
+    if (body.is_random_eligible !== undefined) updates.is_random_eligible = Boolean(body.is_random_eligible);
+    if (body.deadline_reminder_sent !== undefined) updates.deadline_reminder_sent = Boolean(body.deadline_reminder_sent);
+    if (body.deadline_expired_sent !== undefined) updates.deadline_expired_sent = Boolean(body.deadline_expired_sent);
 
-    db.prepare(`
-      UPDATE tasks
-      SET title = ?, description = ?, category = ?, priority = ?,
-          due_date = ?, deadline_time = ?, reminder_offset = ?,
-          is_random_eligible = ?, status = ?
-      WHERE id = ? AND user_id = ?
-    `).run(
-      newTitle, newDesc, newCategory, newPriority,
-      newDueDate, newDeadlineTime, newReminderOffset,
-      newRandomEligible, newStatus,
-      taskId, user.id
-    );
+    const updatedTask = await dbUpdateTask(params.id, user.id, updates);
+    if (!updatedTask) {
+      throw new Error('Failed to update task');
+    }
 
-    const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId) as Task;
     return NextResponse.json({ task: updatedTask, message: 'Task updated successfully' });
   } catch (error: unknown) {
-    const errMessage = error instanceof Error ? error.message : 'Update failed';
+    const errMessage = error instanceof Error ? error.message : 'Failed to update task';
     return NextResponse.json({ error: errMessage }, { status: 500 });
   }
 }
@@ -65,16 +70,15 @@ export async function DELETE(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const taskId = params.id;
-  const db = getDb();
-
-  // Enforce ownership authorization check (IDOR Protection)
-  const existing = db.prepare('SELECT id FROM tasks WHERE id = ? AND user_id = ?').get(taskId, user.id);
+  const existing = await dbGetTaskById(params.id, user.id);
   if (!existing) {
     return NextResponse.json({ error: 'Task not found or access denied' }, { status: 404 });
   }
 
-  db.prepare('DELETE FROM tasks WHERE id = ? AND user_id = ?').run(taskId, user.id);
+  const success = await dbDeleteTask(params.id, user.id);
+  if (!success) {
+    return NextResponse.json({ error: 'Failed to delete task' }, { status: 500 });
+  }
 
   return NextResponse.json({ message: 'Task deleted successfully' });
 }

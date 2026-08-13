@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
-import { getDb } from '@/lib/db';
+import { dbGetTasks, dbCreateTask, dbUpdateTask } from '@/lib/db-adapter';
 import { Task } from '@/lib/types';
 import { getTodayDateString } from '@/lib/dates';
 
@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDb();
   const searchParams = req.nextUrl.searchParams;
   const statusParam = searchParams.get('status');
   const categoryParam = searchParams.get('category');
@@ -22,55 +21,27 @@ export async function GET(req: NextRequest) {
 
   // Automatic overdue check before listing
   try {
-    db.prepare(`
-      UPDATE tasks
-      SET status = 'OVERDUE'
-      WHERE user_id = ?
-        AND status = 'PENDING'
-        AND (
-          due_date < ?
-          OR (due_date = ? AND deadline_time IS NOT NULL AND deadline_time < ?)
-        )
-    `).run(user.id, todayStr, todayStr, currentTimeStr);
-  } catch (e) {
-    // Ignore update error
-  }
-
-  let query = 'SELECT * FROM tasks WHERE user_id = ?';
-  const params: unknown[] = [user.id];
-
-  if (statusParam) {
-    const sUpper = statusParam.toUpperCase();
-    if (sUpper === 'COMPLETED') {
-      query += " AND status = 'COMPLETED'";
-    } else if (sUpper === 'PENDING' || sUpper === 'ACTIVE') {
-      // Include both PENDING and OVERDUE tasks in active mission list
-      query += " AND status IN ('PENDING', 'OVERDUE')";
-    } else if (sUpper === 'OVERDUE') {
-      query += " AND status = 'OVERDUE'";
+    const allPending = await dbGetTasks(user.id, { status: 'PENDING' });
+    for (const t of allPending) {
+      if (!t.due_date) continue;
+      const isOverdue =
+        t.due_date < todayStr ||
+        (t.due_date === todayStr && t.deadline_time && t.deadline_time < currentTimeStr);
+      if (isOverdue) {
+        await dbUpdateTask(t.id, user.id, { status: 'OVERDUE' });
+      }
     }
-  } else {
-    // Default to active missions (PENDING + OVERDUE)
-    query += " AND status IN ('PENDING', 'OVERDUE')";
+  } catch (e) {
+    // Ignore automatic update error
   }
 
-  if (categoryParam && categoryParam !== 'All') {
-    query += ' AND category = ?';
-    params.push(categoryParam);
-  }
+  const tasks = await dbGetTasks(user.id, {
+    status: statusParam || undefined,
+    category: categoryParam || undefined,
+    search: searchParam || undefined,
+  });
 
-  if (searchParam && searchParam.trim()) {
-    query += ' AND (title LIKE ? OR description LIKE ?)';
-    const term = `%${searchParam.trim()}%`;
-    params.push(term, term);
-  }
-
-  // Use single quotes for SQLite string literals in CASE WHEN
-  query += " ORDER BY CASE status WHEN 'PENDING' THEN 1 WHEN 'OVERDUE' THEN 2 ELSE 3 END, due_date ASC, created_at DESC";
-
-  const rows = db.prepare(query).all(...params) as Task[];
-
-  return NextResponse.json({ tasks: rows });
+  return NextResponse.json({ tasks });
 }
 
 export async function POST(req: NextRequest) {
@@ -94,33 +65,31 @@ export async function POST(req: NextRequest) {
     const cleanDueDate = due_date || getTodayDateString();
     const cleanDeadlineTime = deadline_time || '23:59';
     const cleanReminderOffset = typeof reminder_offset === 'number' ? reminder_offset : 30;
-    const cleanRandomEligible = is_random_eligible === false ? 0 : 1;
+    const cleanRandomEligible = is_random_eligible !== false;
 
-    const db = getDb();
-    db.prepare(`
-      INSERT INTO tasks (
-        id, user_id, title, description, category, priority, status,
-        due_date, deadline_time, reminder_offset, is_random_eligible,
-        completed_at, deadline_reminder_sent, deadline_expired_sent,
-        challenge_id, challenge_day_num, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, NULL, 0, 0, NULL, NULL, ?)
-    `).run(
-      taskId,
-      user.id,
-      title.trim(),
-      description ? description.trim() : null,
-      cleanCategory,
-      cleanPriority,
-      cleanDueDate,
-      cleanDeadlineTime,
-      cleanReminderOffset,
-      cleanRandomEligible,
-      createdAt
-    );
+    const newTask: Task = {
+      id: taskId,
+      user_id: user.id,
+      title: title.trim(),
+      description: description ? description.trim() : null,
+      category: cleanCategory,
+      priority: cleanPriority,
+      status: 'PENDING',
+      due_date: cleanDueDate,
+      deadline_time: cleanDeadlineTime,
+      reminder_offset: cleanReminderOffset,
+      is_random_eligible: cleanRandomEligible,
+      completed_at: null,
+      deadline_reminder_sent: false,
+      deadline_expired_sent: false,
+      challenge_id: null,
+      challenge_day_num: null,
+      created_at: createdAt,
+    };
 
-    const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId) as Task;
+    const created = await dbCreateTask(newTask);
 
-    return NextResponse.json({ task, message: 'Task created successfully' }, { status: 201 });
+    return NextResponse.json({ task: created, message: 'Task created successfully' }, { status: 201 });
   } catch (error: unknown) {
     const errMessage = error instanceof Error ? error.message : 'Failed to create task';
     return NextResponse.json({ error: errMessage }, { status: 500 });

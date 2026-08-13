@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
-import { getDb } from '@/lib/db';
-import path from 'path';
-import fs from 'fs';
+import { dbUpdateUser } from '@/lib/db-adapter';
+import { getSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase';
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -32,27 +31,41 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    
-    // Determine extension safely
-    let ext = '.png';
-    if (file.type.includes('jpeg') || file.type.includes('jpg')) ext = '.jpg';
-    else if (file.type.includes('webp')) ext = '.webp';
-    else if (file.type.includes('gif')) ext = '.gif';
+    let avatarUrl = '';
 
-    const fileName = `avatar_${user.id}_${Date.now()}${ext}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'avatars');
+    // Attempt upload to Supabase Storage bucket 'avatars' if Supabase credentials are live
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = getSupabaseServerClient();
+        const fileName = `avatar_${user.id}_${Date.now()}.${file.type.split('/')[1] || 'png'}`;
+        const { data: uploadData, error: uploadErr } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, buffer, {
+            contentType: file.type,
+            upsert: true,
+          });
 
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+        if (!uploadErr && uploadData) {
+          const { data: pubUrlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+          if (pubUrlData?.publicUrl) {
+            avatarUrl = pubUrlData.publicUrl;
+          }
+        }
+      } catch (storageErr) {
+        // Fall through to persistent Data URL
+      }
     }
 
-    const filePath = path.join(uploadDir, fileName);
-    fs.writeFileSync(filePath, buffer);
+    // Persistent serverless fallback: Store as base64 Data URL
+    if (!avatarUrl) {
+      const base64 = buffer.toString('base64');
+      avatarUrl = `data:${file.type};base64,${base64}`;
+    }
 
-    const avatarUrl = `/uploads/avatars/${fileName}`;
-
-    const db = getDb();
-    db.prepare('UPDATE users SET avatar_url = ? WHERE id = ?').run(avatarUrl, user.id);
+    const updatedUser = await dbUpdateUser(user.id, { avatar_url: avatarUrl });
+    if (!updatedUser) {
+      throw new Error('Failed to update avatar in database');
+    }
 
     return NextResponse.json({ avatar_url: avatarUrl, message: 'Avatar uploaded successfully!' });
   } catch (error: unknown) {
