@@ -257,6 +257,40 @@
       "longest_streak": 0,
       "status": "ACTIVE",
       "created_at": "2026-08-14T05:50:10.224Z"
+    },
+    {
+      "id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "title": "DSA",
+      "description": null,
+      "category": "Study",
+      "start_date": "2026-08-14",
+      "end_date": "2026-09-03",
+      "target_days": 21,
+      "current_day": 1,
+      "completed_days_count": 0,
+      "missed_days_count": 0,
+      "current_streak": 0,
+      "longest_streak": 0,
+      "status": "ACTIVE",
+      "created_at": "2026-08-14T17:20:56.454Z"
+    },
+    {
+      "id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "title": "english",
+      "description": null,
+      "category": "Study",
+      "start_date": "2026-08-14",
+      "end_date": "2026-09-03",
+      "target_days": 21,
+      "current_day": 1,
+      "completed_days_count": 0,
+      "missed_days_count": 0,
+      "current_streak": 0,
+      "longest_streak": 0,
+      "status": "ACTIVE",
+      "created_at": "2026-08-14T17:22:04.688Z"
     }
   ],
   "challenge_logs": [
@@ -484,6 +518,426 @@
       "id": "fe80d302-42f1-4046-8c6a-9f961091bf7f",
       "challenge_id": "d366dffc-b1f5-4ec3-852b-74d38a53ed05",
       "user_id": "3f56914c-1098-4945-98de-80be491655c5",
+      "day_number": 21,
+      "date_str": "2026-09-03",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "e96b20fc-4f09-4d27-a91f-de7958a45612",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 1,
+      "date_str": "2026-08-14",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "36e3a438-8d46-45f1-8bee-369f42cd740b",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 2,
+      "date_str": "2026-08-15",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "941876ec-f681-4bf1-99aa-6efba918ead7",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 3,
+      "date_str": "2026-08-16",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "e95fa1b2-a62c-40de-abb3-a85431dc247c",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 4,
+      "date_str": "2026-08-17",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "d35465ca-5002-4a0a-bbeb-e864fb8934e1",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 5,
+      "date_str": "2026-08-18",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "59cbc2e7-76a2-4d9b-935e-070a6fa17bdb",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 6,
+      "date_str": "2026-08-19",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "2af853e0-ca5a-4649-a4f8-c29e8d816ed6",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 7,
+      "date_str": "2026-08-20",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "8a728152-c027-4277-a3ae-d8067a0686e0",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 8,
+      "date_str": "2026-08-21",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "69df7de5-47f9-4521-85f0-377062cbfdaa",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 9,
+      "date_str": "2026-08-22",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "d8f10620-5d90-4800-b179-27a9c04caa7f",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 10,
+      "date_str": "2026-08-23",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "bec7e827-2254-45ee-a0da-7eb18e302878",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 11,
+      "date_str": "2026-08-24",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "62b80869-b75d-419e-9ec5-0d9d80589494",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 12,
+      "date_str": "2026-08-25",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "aec252f7-6781-4cef-a926-9ec0914f5402",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 13,
+      "date_str": "2026-08-26",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "65ab041d-f067-45ab-a5c2-68efce6ae838",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 14,
+      "date_str": "2026-08-27",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "3b084f5f-1b43-4956-8d8a-fda33ebe19af",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 15,
+      "date_str": "2026-08-28",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "da5b8507-5b67-4e49-8b31-b36d48ad6328",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 16,
+      "date_str": "2026-08-29",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "37d1cf06-ecce-4e19-a8f5-2a5b0c1ed3c1",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 17,
+      "date_str": "2026-08-30",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "5bd991d3-9aea-4f84-a12b-7061ea75ed07",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 18,
+      "date_str": "2026-08-31",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "719f5be0-2608-405b-b4b9-8ffd5ada82b0",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 19,
+      "date_str": "2026-09-01",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "b91b4db5-9a1e-40da-9356-52bcd5464d92",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 20,
+      "date_str": "2026-09-02",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "c75cd112-37a9-4695-925f-5faa24a47ec7",
+      "challenge_id": "9a531380-e5da-4cae-ad13-2fc16a9bf001",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 21,
+      "date_str": "2026-09-03",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "11d49f59-2b51-4ec3-a47d-1e4d8d864c87",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 1,
+      "date_str": "2026-08-14",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "2143c231-87b2-4dd7-bed9-4259befcce21",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 2,
+      "date_str": "2026-08-15",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "8ceb3d10-0635-4791-8fe7-e01b38fb370a",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 3,
+      "date_str": "2026-08-16",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "1ae26b66-a02d-4f43-a20f-7d36740270b2",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 4,
+      "date_str": "2026-08-17",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "0a159eb8-2e2d-4782-948f-ca507029c5cd",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 5,
+      "date_str": "2026-08-18",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "aff55e85-b43b-4a88-92f6-4a2ba93b67cd",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 6,
+      "date_str": "2026-08-19",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "8d59ffd7-e7ba-4d9f-a60a-03eb89673b8f",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 7,
+      "date_str": "2026-08-20",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "69cae039-d62a-4594-8fdf-de6690a41c04",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 8,
+      "date_str": "2026-08-21",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "ed0c7ed0-88cd-487b-86d7-06ca9b30e826",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 9,
+      "date_str": "2026-08-22",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "3f99a60a-e1f1-490b-9572-10fd54a6a10e",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 10,
+      "date_str": "2026-08-23",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "83b5e4c1-dbcf-4caf-9363-cffb867b1ba7",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 11,
+      "date_str": "2026-08-24",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "c2e58869-6570-45d9-b985-e03718172582",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 12,
+      "date_str": "2026-08-25",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "007addf1-4dca-4725-afa3-ab4104b3514c",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 13,
+      "date_str": "2026-08-26",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "6f86fbcf-28ba-4581-b04a-e0e8e827c994",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 14,
+      "date_str": "2026-08-27",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "c9a254be-669e-48ff-bd22-3b387ab3a1e6",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 15,
+      "date_str": "2026-08-28",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "4db97b9e-aafa-408f-8c0a-0d23fd732887",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 16,
+      "date_str": "2026-08-29",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "4ad5e217-057a-4911-a3b2-382f84a3c3b7",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 17,
+      "date_str": "2026-08-30",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "a4786935-efd2-4f18-862f-e3bb4b181580",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 18,
+      "date_str": "2026-08-31",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "90367a2b-6700-4b73-88de-17a69f2399f3",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 19,
+      "date_str": "2026-09-01",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "0c525e63-d9a3-4e17-830f-5826de467464",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
+      "day_number": 20,
+      "date_str": "2026-09-02",
+      "status": "PENDING",
+      "task_id": null,
+      "completed_at": null
+    },
+    {
+      "id": "942d5285-2315-434b-b946-24149a865141",
+      "challenge_id": "779b4190-ffd2-4ed2-ab21-f442ad780251",
+      "user_id": "9cbe7b6f-884a-4d78-95ac-b2f083aad718",
       "day_number": 21,
       "date_str": "2026-09-03",
       "status": "PENDING",
