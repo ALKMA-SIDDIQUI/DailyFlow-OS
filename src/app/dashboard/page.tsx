@@ -8,7 +8,7 @@ import { TaskCard } from '@/components/tasks/TaskCard';
 import { ChallengeGrid } from '@/components/challenges/ChallengeGrid';
 import { EditTaskModal } from '@/components/tasks/EditTaskModal';
 import { Task, Challenge, DashboardStats, ActivityHeatmapDay, User } from '@/lib/types';
-import { Sparkles, Trophy, CheckSquare, Clock } from 'lucide-react';
+import { Sparkles, Trophy, CheckSquare, Clock, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardOverviewPage() {
@@ -27,6 +27,12 @@ export default function DashboardOverviewPage() {
     heatmap: [],
   });
 
+  const triggerStartChallenge = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('dailyflow_open_start_challenge'));
+    }
+  };
+
   const [heatmap, setHeatmap] = useState<ActivityHeatmapDay[]>([]);
   const [todayTasks, setTodayTasks] = useState<Task[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -36,7 +42,7 @@ export default function DashboardOverviewPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const profileRes = await fetch('/api/profile');
+      const profileRes = await fetch('/api/profile', { cache: 'no-store' });
       if (profileRes.ok) {
         const pData = await profileRes.json();
         if (pData.user) {
@@ -47,20 +53,20 @@ export default function DashboardOverviewPage() {
           setHeatmap(pData.stats.heatmap || []);
         }
       } else {
-        const meRes = await fetch('/api/auth/me');
+        const meRes = await fetch('/api/auth/me', { cache: 'no-store' });
         if (meRes.ok) {
           const meData = await meRes.json();
           if (meData.user) setUser(meData.user);
         }
       }
 
-      const tasksRes = await fetch('/api/tasks?status=PENDING');
+      const tasksRes = await fetch('/api/tasks?status=PENDING', { cache: 'no-store' });
       if (tasksRes.ok) {
         const tData = await tasksRes.json();
         setTodayTasks(tData.tasks || []);
       }
 
-      const chalRes = await fetch('/api/challenges');
+      const chalRes = await fetch('/api/challenges', { cache: 'no-store' });
       if (chalRes.ok) {
         const cData = await chalRes.json();
         setChallenges(cData.challenges || []);
@@ -127,12 +133,21 @@ export default function DashboardOverviewPage() {
             <Trophy className="w-5 h-5 text-emerald-400" />
             <h2 className="font-extrabold text-lg text-slate-100">21-Day Consistency Habits</h2>
           </div>
-          <Link
-            href="/dashboard/challenges"
-            className="text-xs font-semibold text-cyan-400 hover:underline"
-          >
-            View All Habits →
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={triggerStartChallenge}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-extrabold text-xs shadow-emerald-glow transition-all active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+              <span>Start Habit</span>
+            </button>
+            <Link
+              href="/dashboard/challenges"
+              className="text-xs font-semibold text-cyan-400 hover:underline"
+            >
+              View All Habits →
+            </Link>
+          </div>
         </div>
 
         {challenges.length === 0 ? (
@@ -142,6 +157,13 @@ export default function DashboardOverviewPage() {
             <p className="text-xs text-slate-400 mt-1 mb-4">
               Commit to 21 consecutive days of consistent action and watch your streak explode.
             </p>
+            <button
+              onClick={triggerStartChallenge}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-emerald-glow transition-all active:scale-95"
+            >
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>Begin 21-Day Journey</span>
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">

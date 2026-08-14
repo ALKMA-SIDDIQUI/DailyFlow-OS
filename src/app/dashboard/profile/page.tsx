@@ -1,16 +1,32 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { User, DashboardStats } from '@/lib/types';
 import { useToast } from '@/components/ui/Toast';
-import { User as UserIcon, Upload, Camera, Save, Lock, Flame, Trophy, CheckCircle2, ShieldCheck, Calendar } from 'lucide-react';
+import { useTheme } from '@/components/ui/ThemeProvider';
+import { User as UserIcon, Upload, Camera, Save, Lock, Flame, Trophy, CheckCircle2, ShieldCheck, Calendar, LogOut, Sun, Moon } from 'lucide-react';
 import { formatPrettyDate } from '@/lib/dates';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { showToast } = useToast();
+  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = async () => {
+    if (!confirm('Are you sure you want to log out?')) return;
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      showToast('Logged out successfully', 'info');
+      router.push('/login');
+      router.refresh();
+    } catch (e) {
+      showToast('Failed to logout', 'error');
+    }
+  };
 
   // Profile Edit state
   const [fullName, setFullName] = useState('');
@@ -393,6 +409,46 @@ export default function ProfilePage() {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* App Preferences & Logout Card */}
+      <div className="glass-panel p-6 rounded-3xl border border-white/10 mb-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-purple-400" />}
+            Theme Mode & Account Session
+          </h3>
+          <p className="text-xs text-slate-400 mt-1">
+            Toggle between Dark/Light visual theme or safely log out of your session on this device.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <button
+            onClick={toggleTheme}
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-200 font-bold text-xs hover:border-cyan-400/50 transition-all active:scale-95"
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun className="w-4 h-4 text-amber-400" />
+                <span>Light Mode</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-4 h-4 text-purple-400" />
+                <span>Dark Mode</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-xs shadow-rose-glow transition-all active:scale-95"
+          >
+            <LogOut className="w-4 h-4 text-rose-400" />
+            <span>Log Out</span>
+          </button>
+        </div>
       </div>
     </div>
   );

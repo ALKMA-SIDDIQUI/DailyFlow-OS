@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import '@/app/globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'DailyFlow — VibeCode Productivity OS & 21-Day Consistency Platform',
@@ -33,9 +34,11 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

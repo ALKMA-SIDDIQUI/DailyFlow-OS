@@ -26,7 +26,7 @@ export function DashboardClientWrapper({
 
   const fetchUserStreak = async () => {
     try {
-      const res = await fetch('/api/profile');
+      const res = await fetch('/api/profile', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setStreakCount(data.stats?.currentStreak || 0);
@@ -38,6 +38,24 @@ export function DashboardClientWrapper({
 
   useEffect(() => {
     fetchUserStreak();
+
+    const handleOpenCreateTask = () => setCreateTaskOpen(true);
+    const handleOpenStartChallenge = () => setStartChallengeOpen(true);
+    const handleOpenRandomTask = () => setRandomTaskOpen(true);
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('dailyflow_open_create_task', handleOpenCreateTask);
+      window.addEventListener('dailyflow_open_start_challenge', handleOpenStartChallenge);
+      window.addEventListener('dailyflow_open_random_task', handleOpenRandomTask);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('dailyflow_open_create_task', handleOpenCreateTask);
+        window.removeEventListener('dailyflow_open_start_challenge', handleOpenStartChallenge);
+        window.removeEventListener('dailyflow_open_random_task', handleOpenRandomTask);
+      }
+    };
   }, []);
 
   const handleTaskOrChallengeUpdated = () => {
@@ -46,7 +64,7 @@ export function DashboardClientWrapper({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex flex-col transition-colors duration-300">
       <DeadlineAlarmListener />
 
       {/* Sticky Navbar Header */}

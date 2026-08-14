@@ -4,6 +4,9 @@ import { dbGetChallenges, dbCreateChallenge } from '@/lib/db-adapter';
 import { Challenge, ChallengeLog } from '@/lib/types';
 import { getTodayDateString, addDaysToDateString } from '@/lib/dates';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   const user = await getSessionUser();
   if (!user) {
@@ -11,7 +14,14 @@ export async function GET() {
   }
 
   const challenges = await dbGetChallenges(user.id);
-  return NextResponse.json({ challenges });
+  return NextResponse.json(
+    { challenges },
+    {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      },
+    }
+  );
 }
 
 export async function POST(req: NextRequest) {

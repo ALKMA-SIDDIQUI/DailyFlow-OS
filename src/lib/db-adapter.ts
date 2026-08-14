@@ -109,20 +109,30 @@ export async function dbGetUserByUsername(username: string): Promise<UserWithHas
 
 export async function dbGetUserByIdentifier(identifier: string): Promise<UserWithHash | null> {
   const clean = identifier.trim().toLowerCase();
+  const cleanNoSpaces = clean.replace(/\s+/g, '');
+
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseServerClient();
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .or(`email.eq.${clean},username.eq.${clean}`)
+        .or(`email.ilike.${clean},username.ilike.${clean},full_name.ilike.${clean}`)
         .maybeSingle();
       if (!error && data) return data as UserWithHash;
     } catch (e) {}
   }
 
   const local = getLocalData();
-  return local.users.find((u) => u.email.toLowerCase() === clean || u.username.toLowerCase() === clean) || null;
+  return (
+    local.users.find(
+      (u) =>
+        u.email.toLowerCase() === clean ||
+        u.username.toLowerCase() === clean ||
+        u.full_name.toLowerCase() === clean ||
+        u.full_name.toLowerCase().replace(/\s+/g, '') === cleanNoSpaces
+    ) || null
+  );
 }
 
 export async function dbCreateUser(userObj: UserWithHash): Promise<User> {
@@ -192,7 +202,7 @@ export async function dbGetTasks(
       query = query.order('due_date', { ascending: true }).order('created_at', { ascending: false });
 
       const { data, error } = await query;
-      if (!error && data) return data as Task[];
+      if (!error && data && data.length > 0) return data as Task[];
     } catch (e) {}
   }
 
@@ -275,8 +285,7 @@ export async function dbDeleteTask(id: string, userId: string): Promise<boolean>
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseServerClient();
-      const { error } = await supabase.from('tasks').delete().eq('id', id).eq('user_id', userId);
-      if (!error) return true;
+      await supabase.from('tasks').delete().eq('id', id).eq('user_id', userId);
     } catch (e) {}
   }
 
@@ -294,7 +303,7 @@ export async function dbGetChallenges(userId: string): Promise<Challenge[]> {
     try {
       const supabase = getSupabaseServerClient();
       const { data: challenges, error } = await supabase.from('challenges').select('*').eq('user_id', userId);
-      if (!error && challenges) {
+      if (!error && challenges && challenges.length > 0) {
         const cIds = challenges.map((c) => c.id);
         const { data: logs } = await supabase.from('challenge_logs').select('*').in('challenge_id', cIds);
         const logsMap: Record<string, ChallengeLog[]> = {};
@@ -380,8 +389,7 @@ export async function dbDeleteChallenge(id: string, userId: string): Promise<boo
       const supabase = getSupabaseServerClient();
       await supabase.from('tasks').delete().eq('challenge_id', id).eq('user_id', userId);
       await supabase.from('challenge_logs').delete().eq('challenge_id', id).eq('user_id', userId);
-      const { error } = await supabase.from('challenges').delete().eq('id', id).eq('user_id', userId);
-      if (!error) return true;
+      await supabase.from('challenges').delete().eq('id', id).eq('user_id', userId);
     } catch (e) {}
   }
 

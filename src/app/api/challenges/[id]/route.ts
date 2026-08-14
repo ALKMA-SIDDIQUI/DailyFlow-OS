@@ -3,6 +3,9 @@ import { getSessionUser } from '@/lib/auth';
 import { dbGetChallengeById, dbUpdateChallenge, dbDeleteChallenge, dbUpdateChallengeLog } from '@/lib/db-adapter';
 import { getTodayDateString } from '@/lib/dates';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }

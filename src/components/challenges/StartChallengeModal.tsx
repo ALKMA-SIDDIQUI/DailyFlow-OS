@@ -43,6 +43,9 @@ export const StartChallengeModal: React.FC<StartChallengeModalProps> = ({ isOpen
       if (!res.ok) throw new Error(data.error || 'Failed to start challenge');
 
       showToast('🎉 21-Day Habit Challenge Started!', 'success');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('dailyflow_data_updated'));
+      }
       setTitle('');
       setDescription('');
       onChallengeCreated();

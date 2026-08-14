@@ -4,6 +4,9 @@ import { dbGetTasks, dbCreateTask, dbUpdateTask } from '@/lib/db-adapter';
 import { Task } from '@/lib/types';
 import { getTodayDateString } from '@/lib/dates';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(req: NextRequest) {
   const user = await getSessionUser();
   if (!user) {
@@ -41,7 +44,14 @@ export async function GET(req: NextRequest) {
     search: searchParam || undefined,
   });
 
-  return NextResponse.json({ tasks });
+  return NextResponse.json(
+    { tasks },
+    {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      },
+    }
+  );
 }
 
 export async function POST(req: NextRequest) {

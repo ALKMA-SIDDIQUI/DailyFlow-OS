@@ -4,6 +4,9 @@ import { dbGetTasks, dbGetChallenges, dbGetUserByUsername, dbUpdateUser } from '
 import { ActivityHeatmapDay, DailyProgressItem } from '@/lib/types';
 import { getTodayDateString, calculateUserStreaks, addDaysToDateString } from '@/lib/dates';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   const user = await getSessionUser();
   if (!user) {

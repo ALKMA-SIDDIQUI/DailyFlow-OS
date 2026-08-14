@@ -3,15 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { ChallengeGrid } from '@/components/challenges/ChallengeGrid';
 import { Challenge } from '@/lib/types';
-import { Trophy } from 'lucide-react';
+import { Trophy, Plus } from 'lucide-react';
 
 export default function ChallengesHubPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const triggerStartChallenge = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('dailyflow_open_start_challenge'));
+    }
+  };
+
   const fetchChallenges = async () => {
     try {
-      const res = await fetch('/api/challenges');
+      const res = await fetch('/api/challenges', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setChallenges(data.challenges || []);
@@ -54,6 +60,14 @@ export default function ChallengesHubPage() {
             Build permanent habits through 21 consecutive days of focused execution
           </p>
         </div>
+
+        <button
+          onClick={triggerStartChallenge}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-extrabold text-xs shadow-emerald-glow transition-all active:scale-95"
+        >
+          <Plus className="w-4 h-4 stroke-[3]" />
+          <span>Start 21-Day Habit</span>
+        </button>
       </div>
 
       {/* Challenges List */}
@@ -66,6 +80,13 @@ export default function ChallengesHubPage() {
           <p className="text-xs text-slate-400 mt-1 mb-4">
             Start a 21-day challenge today to build your daily consistency grid.
           </p>
+          <button
+            onClick={triggerStartChallenge}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-emerald-glow transition-all active:scale-95"
+          >
+            <Plus className="w-4 h-4 stroke-[3]" />
+            <span>Begin 21-Day Journey</span>
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
