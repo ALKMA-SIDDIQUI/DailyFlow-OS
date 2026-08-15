@@ -50,7 +50,7 @@ export default async function LandingPage() {
       <main className="max-w-7xl mx-auto px-6 py-16 flex-1 flex flex-col items-center justify-center text-center relative z-10">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-6 shadow-vibe-glow">
           <Sparkles className="w-4 h-4 text-cyan-400" />
-          <span>Next-Gen VibeCode Productivity OS</span>
+          <span>Next-Gen Productivity OS</span>
         </div>
 
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-4xl text-gradient-hero leading-[1.1]">
@@ -113,7 +113,7 @@ export default async function LandingPage() {
 
       {/* Footer */}
       <footer className="w-full glass-panel border-t border-white/10 py-6 text-center text-xs text-slate-500">
-        <p>© 2026 DailyFlow Vibe OS • Engineered for Peak Productivity</p>
+        <p>© 2026 DailyFlow OS • Engineered for Peak Productivity</p>
       </footer>
     </div>
   );
