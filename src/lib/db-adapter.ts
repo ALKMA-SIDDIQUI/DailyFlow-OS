@@ -82,6 +82,36 @@ export async function dbGetUserById(id: string): Promise<UserWithHash | null> {
   return local.users.find((u) => u.id === id) || null;
 }
 
+async function syncUserToSupabaseIfMissing(localUser: UserWithHash): Promise<UserWithHash> {
+  if (!isSupabaseConfigured()) return localUser;
+  try {
+    const supabase = getSupabaseServerClient();
+    const { data } = await supabase.from('users').select('*').eq('email', localUser.email.toLowerCase()).maybeSingle();
+    if (data) return data as UserWithHash;
+
+    const { data: insertedUser } = await supabase.from('users').insert(localUser).select('*').maybeSingle();
+    if (insertedUser) {
+      const local = getLocalData();
+      const userTasks = local.tasks.filter((t) => t.user_id === localUser.id);
+      if (userTasks.length > 0) {
+        await supabase.from('tasks').insert(userTasks);
+      }
+      const userChallenges = local.challenges.filter((c) => c.user_id === localUser.id);
+      if (userChallenges.length > 0) {
+        await supabase.from('challenges').insert(userChallenges);
+        const userLogs = local.challenge_logs.filter((l) => l.user_id === localUser.id);
+        if (userLogs.length > 0) {
+          await supabase.from('challenge_logs').insert(userLogs);
+        }
+      }
+      return insertedUser as UserWithHash;
+    }
+  } catch (e) {
+    console.error('Failed to auto-migrate local user to Supabase:', e);
+  }
+  return localUser;
+}
+
 export async function dbGetUserByEmail(email: string): Promise<UserWithHash | null> {
   const cleanEmail = email.trim().toLowerCase();
   if (isSupabaseConfigured()) {
@@ -93,7 +123,11 @@ export async function dbGetUserByEmail(email: string): Promise<UserWithHash | nu
   }
 
   const local = getLocalData();
-  return local.users.find((u) => u.email.toLowerCase() === cleanEmail) || null;
+  const localUser = local.users.find((u) => u.email.toLowerCase() === cleanEmail);
+  if (localUser && isSupabaseConfigured()) {
+    return await syncUserToSupabaseIfMissing(localUser);
+  }
+  return localUser || null;
 }
 
 export async function dbGetUserByUsername(username: string): Promise<UserWithHash | null> {
@@ -107,7 +141,11 @@ export async function dbGetUserByUsername(username: string): Promise<UserWithHas
   }
 
   const local = getLocalData();
-  return local.users.find((u) => u.username.toLowerCase() === cleanUsername) || null;
+  const localUser = local.users.find((u) => u.username.toLowerCase() === cleanUsername);
+  if (localUser && isSupabaseConfigured()) {
+    return await syncUserToSupabaseIfMissing(localUser);
+  }
+  return localUser || null;
 }
 
 export async function dbGetUserByIdentifier(identifier: string): Promise<UserWithHash | null> {
@@ -127,15 +165,19 @@ export async function dbGetUserByIdentifier(identifier: string): Promise<UserWit
   }
 
   const local = getLocalData();
-  return (
-    local.users.find(
-      (u) =>
-        u.email.toLowerCase() === clean ||
-        u.username.toLowerCase() === clean ||
-        u.full_name.toLowerCase() === clean ||
-        u.full_name.toLowerCase().replace(/\s+/g, '') === cleanNoSpaces
-    ) || null
+  const localUser = local.users.find(
+    (u) =>
+      u.email.toLowerCase() === clean ||
+      u.username.toLowerCase() === clean ||
+      u.full_name.toLowerCase() === clean ||
+      u.full_name.toLowerCase().replace(/\s+/g, '') === cleanNoSpaces
   );
+
+  if (localUser && isSupabaseConfigured()) {
+    return await syncUserToSupabaseIfMissing(localUser);
+  }
+
+  return localUser || null;
 }
 
 export async function dbCreateUser(userObj: UserWithHash): Promise<User> {

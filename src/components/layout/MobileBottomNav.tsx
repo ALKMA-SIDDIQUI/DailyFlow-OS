@@ -73,6 +73,18 @@ export const MobileBottomNav: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <Link
+                href="/dashboard/completed"
+                onClick={() => setQuickMenuOpen(false)}
+                className="flex items-center gap-2.5 p-3 rounded-2xl bg-teal-500/20 border border-teal-500/40 text-teal-300 font-bold text-xs shadow-emerald-glow active:scale-95 text-left"
+              >
+                <CheckCircle2 className="w-5 h-5 text-teal-400 shrink-0" />
+                <div className="flex flex-col">
+                  <span>Completed History</span>
+                  <span className="text-[10px] text-teal-400/80 font-normal">Past achievements</span>
+                </div>
+              </Link>
+
               <button
                 onClick={() => triggerEvent('dailyflow_open_start_challenge')}
                 className="flex items-center gap-2.5 p-3 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs shadow-emerald-glow active:scale-95 text-left"
@@ -111,17 +123,14 @@ export const MobileBottomNav: React.FC = () => {
                   toggleTheme();
                   setQuickMenuOpen(false);
                 }}
-                className="flex items-center gap-2.5 p-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-slate-200 font-bold text-xs active:scale-95 text-left"
+                className="col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-slate-200 font-bold text-xs active:scale-95"
               >
                 {theme === 'dark' ? (
                   <Sun className="w-5 h-5 text-amber-400 shrink-0" />
                 ) : (
                   <Moon className="w-5 h-5 text-purple-400 shrink-0" />
                 )}
-                <div className="flex flex-col">
-                  <span>{theme === 'dark' ? 'Light Theme' : 'Dark Theme'}</span>
-                  <span className="text-[10px] text-slate-400 font-normal">Toggle visuals</span>
-                </div>
+                <span>{theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}</span>
               </button>
             </div>
           </div>
