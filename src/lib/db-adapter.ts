@@ -3,7 +3,10 @@ import path from 'path';
 import { getSupabaseServerClient, isSupabaseConfigured } from './supabase';
 import { User, Task, Challenge, ChallengeLog } from './types';
 
-const LOCAL_DB_PATH = path.join(process.cwd(), 'data', 'local_db.json');
+const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const LOCAL_DB_PATH = isVercel
+  ? path.join('/tmp', 'local_db.json')
+  : path.join(process.cwd(), 'data', 'local_db.json');
 
 type UserWithHash = User & { password_hash: string };
 

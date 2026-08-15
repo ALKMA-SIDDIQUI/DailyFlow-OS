@@ -153,16 +153,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </Link>
             </div>
-
-            {/* Mobile & Desktop Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-xl text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-all flex items-center gap-1 active:scale-95"
-              title="Log Out"
-            >
-              <LogOut className="w-4 h-4 text-rose-400" />
-              <span className="hidden lg:inline text-xs font-bold">Logout</span>
-            </button>
           </div>
         ) : (
           <div className="flex items-center gap-3">

@@ -124,21 +124,13 @@ export const MobileBottomNav: React.FC = () => {
                 </div>
               </button>
             </div>
-
-            <button
-              onClick={handleLogout}
-              className="mt-1 flex items-center justify-center gap-2 p-3 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-xs active:scale-95"
-            >
-              <LogOut className="w-4 h-4 text-rose-400" />
-              <span>Log Out Account</span>
-            </button>
           </div>
         </div>
       )}
 
       {/* Main Bottom Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-white/10 px-2 py-1.5 backdrop-blur-xl pb-safe">
-        <div className="flex items-center justify-between max-w-md mx-auto">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-white/10 px-3 py-1.5 backdrop-blur-xl pb-safe">
+        <div className="flex items-center justify-around max-w-md mx-auto">
           {mainNav.slice(0, 2).map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -187,16 +179,6 @@ export const MobileBottomNav: React.FC = () => {
               </Link>
             );
           })}
-
-          {/* Quick Logout Button on Bottom Bar */}
-          <button
-            onClick={handleLogout}
-            className="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all"
-            title="Log Out Account"
-          >
-            <LogOut className="w-4 h-4 text-rose-400" />
-            <span className="text-[9px] tracking-tight text-rose-400 font-bold">Logout</span>
-          </button>
         </div>
       </nav>
     </>
